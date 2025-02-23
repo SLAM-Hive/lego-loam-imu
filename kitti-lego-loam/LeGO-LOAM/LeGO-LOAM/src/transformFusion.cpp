@@ -221,68 +221,84 @@ public:
         laserOdometry2.pose.pose.position.z = transformMapped[5];
         pubLaserOdometry2.publish(laserOdometry2);
 
+	// ****************************Output trajectory******************************
+	std::ofstream pose1(RESULT_PATH, std::ios::app);
+	pose1.setf(std::ios::scientific, std::ios::floatfield);
+	pose1.precision(8);
+	
+	pose1 << laserOdometry2.header.stamp << " "
+			<< laserOdometry2.pose.pose.position.x << " "
+			<< laserOdometry2.pose.pose.position.y << " "
+			<< laserOdometry2.pose.pose.position.z << " "
+			<< laserOdometry2.pose.pose.orientation.x << " "
+			<< laserOdometry2.pose.pose.orientation.y << " "
+			<< laserOdometry2.pose.pose.orientation.z << " "
+			<< laserOdometry2.pose.pose.orientation.w << std::endl;
+	pose1.close();
+
+
 /////////////////////added, cout results///////////////////
 
-	Eigen::Quaterniond q;
+	// Eigen::Quaterniond q;
 
-	q.w()=laserOdometry2.pose.pose.orientation.w;
-	q.x()=laserOdometry2.pose.pose.orientation.x;
-	q.y()=laserOdometry2.pose.pose.orientation.y;
-	q.z()=laserOdometry2.pose.pose.orientation.z;
+	// q.w()=laserOdometry2.pose.pose.orientation.w;
+	// q.x()=laserOdometry2.pose.pose.orientation.x;
+	// q.y()=laserOdometry2.pose.pose.orientation.y;
+	// q.z()=laserOdometry2.pose.pose.orientation.z;
 
-	Eigen::Matrix3d R = q.toRotationMatrix();
+	// Eigen::Matrix3d R = q.toRotationMatrix();
 
-	if (init_flag==true)	
-	{
+	// if (init_flag==true)	
+	// {
 		
-	H_init<< R.row(0)[0],R.row(0)[1],R.row(0)[2],transformMapped[3],
-       	 	 R.row(1)[0],R.row(1)[1],R.row(1)[2],transformMapped[4],
-       	 	 R.row(2)[0],R.row(2)[1],R.row(2)[2],transformMapped[5],
-          	 0,0,0,1;  
+	// H_init<< R.row(0)[0],R.row(0)[1],R.row(0)[2],transformMapped[3],
+    //    	 	 R.row(1)[0],R.row(1)[1],R.row(1)[2],transformMapped[4],
+    //    	 	 R.row(2)[0],R.row(2)[1],R.row(2)[2],transformMapped[5],
+    //       	 0,0,0,1;  
 	
-	init_flag=false;
+	// init_flag=false;
 
-	std::cout<<"surf_th : "<<surfThreshold<<endl;
+	// std::cout<<"surf_th : "<<surfThreshold<<endl;
 
- 	}
+ 	// }
 
-	H_rot<<	-1,0,0,0,
-	    	 0,-1,0,0,
-     	   	 0,0,1,0,	
-     	    	 0,0,0,1; 
+	// H_rot<<	-1,0,0,0,
+	//     	 0,-1,0,0,
+    //  	   	 0,0,1,0,	
+    //  	    	 0,0,0,1; 
 		
-	H<<  R.row(0)[0],R.row(0)[1],R.row(0)[2],transformMapped[3],
-	     R.row(1)[0],R.row(1)[1],R.row(1)[2],transformMapped[4],
-     	     R.row(2)[0],R.row(2)[1],R.row(2)[2],transformMapped[5],
-     	     0,0,0,1;  
+	// H<<  R.row(0)[0],R.row(0)[1],R.row(0)[2],transformMapped[3],
+	//      R.row(1)[0],R.row(1)[1],R.row(1)[2],transformMapped[4],
+    //  	     R.row(2)[0],R.row(2)[1],R.row(2)[2],transformMapped[5],
+    //  	     0,0,0,1;  
 
 	
 
-	H = H_rot*H_init.inverse()*H; //to get H12 = H10*H02 , 180 rot according to z axis
+	// H = H_rot*H_init.inverse()*H; //to get H12 = H10*H02 , 180 rot according to z axis
 
-	std::ofstream foutC(RESULT_PATH, std::ios::app);
+	// std::ofstream foutC(RESULT_PATH, std::ios::app);
 
-	foutC.setf(std::ios::scientific, std::ios::floatfield);
-        foutC.precision(6);
+	// foutC.setf(std::ios::scientific, std::ios::floatfield);
+    //     foutC.precision(6);
  
-	//foutC << R[0] << " "<<transformMapped[3]<<" "<< R.row(1) <<" "<<transformMapped[4] <<" "<<  R.row(2) <<" "<< transformMapped[5] << endl;
-	 for (int i = 0; i < 3; ++i)	
-	{	 
-		for (int j = 0; j < 4; ++j)
-        	{
-			if(i==2 && j==3)
-			{
-				foutC <<H.row(i)[j]<< endl ;	
-			}
-			else
-			{
-				foutC <<H.row(i)[j]<< " " ;
-			}
+	// //foutC << R[0] << " "<<transformMapped[3]<<" "<< R.row(1) <<" "<<transformMapped[4] <<" "<<  R.row(2) <<" "<< transformMapped[5] << endl;
+	//  for (int i = 0; i < 3; ++i)	
+	// {	 
+	// 	for (int j = 0; j < 4; ++j)
+    //     	{
+	// 		if(i==2 && j==3)
+	// 		{
+	// 			foutC <<H.row(i)[j]<< endl ;	
+	// 		}
+	// 		else
+	// 		{
+	// 			foutC <<H.row(i)[j]<< " " ;
+	// 		}
 			
-		}
-	}
+	// 	}
+	// }
 
-	foutC.close();
+	// foutC.close();
 
 
 //////////////////////////////////////////////////
